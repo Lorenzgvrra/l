@@ -1,0 +1,148 @@
+//90
+#include <iostream>
+using namespace std;
+
+int main() {
+
+    int choice, payment, totalBill = 0, computedBill = 0, dest, ans;
+    string clientName;
+
+
+    do {
+        cout << "Input your Name: ";
+        cin >> clientName;
+        system("pause");
+        system("cls");
+        do
+        {
+            cout << "Select A Level of Flight Seat\n"
+                << "1. Level 1: 10$\n"
+                << "2. Level 2: 15$\n"
+                << "3. Level 3: 20$\n"
+                << ":: ";
+            cin >> choice;
+            switch (choice) {
+            case 1:
+
+
+                cout << "You chose Level 1\n";
+                totalBill += 10;
+                cout << "Total Bill: " << totalBill << endl;
+                break;
+            case 2:
+
+
+                cout << "You chose Level 2\n";
+                totalBill += 15;
+                cout << "Total Bill: " << totalBill << endl;
+                break;
+            case 3:
+
+
+                cout << "You chose Level 3\n";
+                totalBill += 20;
+                cout << "Total Bill: " << totalBill << endl;
+                break;
+
+
+            default:
+
+                cout << "Incorrect Input\n";
+            }
+            
+        } while (3 < choice);
+        
+        do
+        {
+            cout << "Select a Destination: \n"
+                << "1. Japan: 400$\n"
+                << "2. USA: 1000$\n"
+                << "3. Vietnam: 200$\n"
+                << "::";
+            cin >> dest;
+            switch (dest) {
+            case 1:
+
+                cout << "You chose JAPAN\n";
+                totalBill += 400;
+                cout << "Total Bill: " << totalBill << endl;
+                break;
+            case 2:
+
+                cout << "You chose USA\n";
+                totalBill += 1000;
+                cout << "Total Bill: " << totalBill << endl;
+                break;
+            case 3:
+
+                cout << "You chose VIETNAM\n";
+                totalBill += 200;
+                cout << "Total Bill: " << totalBill << endl;
+                break;
+
+            default:
+                cout << "Incorrect Input\n";
+            }
+        } while (3 < dest);
+        
+        do
+        {
+            cout << "\nWhat do you want to do?\n"
+                << "1. Continue and accomodate for another person\n"
+                << "0. Bill out\n"
+                << "::";
+            cin >> ans;
+            switch (ans)
+            {
+            case 1:
+                ans = 1;
+                break;
+            case 0:
+                ans = 0;
+                break;
+            default:
+                cout << "Incorrect Input\n ";
+                break;
+            }
+        } while (2 < ans);
+        
+
+        if (0 < choice && 3 >= choice && 0 < dest && 3 >= dest) {
+            system("cls");
+            cout << "Current Bill: " << totalBill << "\n";
+        }
+
+
+    } while (ans != 0);
+
+    do {
+
+        cout << "Your bill is " << totalBill << "\n"
+            << "Input Payment: ";
+        cin >> payment;
+
+
+        computedBill = totalBill - payment;
+
+
+        if (0 > computedBill) {
+            cout << "You have a change " << computedBill * -1 << "\n";
+        }
+        else if (0 == computedBill) {
+            cout << "Payment Complete\n";
+
+        }
+        else {
+            system("cls");
+            cout << "Insufficient pay! PAY UP!!!\n\n";
+            system("pause");
+            system("cls");
+        }
+
+    } while (0 < computedBill);
+
+    cout << "You can take the ticket now\n\n\n";
+
+    system("pause");
+    return 0;
+}
