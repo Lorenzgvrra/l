@@ -1,0 +1,215 @@
+#include <iostream>
+#include <string>
+#include <cstdlib>
+
+using namespace std;
+
+// Structure for storing player information
+struct Player {
+    int id;
+    string name;
+    int score;
+    string history[10]; // Store right or wrong per question
+    Player* next;
+};
+
+// Structure for questions
+struct Question {
+    string question;
+    string options[4];
+    char correctAnswer;
+};
+
+// Function Prototypes
+void addPlayer(Player*& head, int& nextId, string name);
+void playGame(Player* head, int id);
+void viewPlayer(Player* head, int id);
+void deletePlayer(Player*& head, int id);
+Player* findPlayerById(Player* head, int id);
+void displayMenu();
+void displayQuestions(Question questions[], Player* player);
+
+// Sample Questions
+Question questions[10] = {
+    {"What is the capital of France?", {"A) Paris", "B) London", "C) Rome", "D) Madrid"}, 'A'},
+    {"Which planet is known as the Red Planet?", {"A) Earth", "B) Mars", "C) Jupiter", "D) Venus"}, 'B'},
+    {"Who wrote 'Hamlet'?", {"A) Charles Dickens", "B) Mark Twain", "C) William Shakespeare", "D) Jane Austen"}, 'C'},
+    {"What is 5 + 7?", {"A) 10", "B) 12", "C) 14", "D) 16"}, 'B'},
+    {"Which gas do plants absorb from the atmosphere?", {"A) Oxygen", "B) Nitrogen", "C) Carbon Dioxide", "D) Hydrogen"}, 'C'},
+    {"Who painted the Mona Lisa?", {"A) Vincent van Gogh", "B) Pablo Picasso", "C) Leonardo da Vinci", "D) Michelangelo"}, 'C'},
+    {"Which element has the chemical symbol 'O'?", {"A) Gold", "B) Oxygen", "C) Silver", "D) Iron"}, 'B'},
+    {"What is the largest ocean?", {"A) Atlantic", "B) Indian", "C) Arctic", "D) Pacific"}, 'D'},
+    {"What is the square root of 64?", {"A) 6", "B) 7", "C) 8", "D) 9"}, 'C'},
+    {"Which country is famous for the Great Wall?", {"A) China", "B) India", "C) Japan", "D) Russia"}, 'A'}
+};
+
+// Add new player to linked list
+void addPlayer(Player*& head, int& nextId, string name) {
+    Player* newPlayer = new Player{nextId++, name, 0, {}, nullptr};
+
+    if (!head) {
+        head = newPlayer;
+    } else {
+        Player* temp = head;
+        while (temp->next) {
+            temp = temp->next;
+        }
+        temp->next = newPlayer;
+    }
+
+    cout << "Player " << name << " added with ID: " << newPlayer->id << endl;
+}
+
+// Play game and update player score
+void playGame(Player* head, int id) {
+    Player* player = findPlayerById(head, id);
+    if (!player) {
+        cout << "Player not found.\n";
+        return;
+    }
+
+    cout << "Starting game for " << player->name << " (ID: " << player->id << ")...\n";
+    displayQuestions(questions, player);
+
+    cout << "Game Over! Final Score: " << player->score << "/10\n";
+}
+
+// View player record
+void viewPlayer(Player* head, int id) {
+    Player* player = findPlayerById(head, id);
+    if (!player) {
+        cout << "Player not found.\n";
+        return;
+    }
+
+    cout << "\nPlayer: " << player->name << " (ID: " << player->id << ")\n";
+    cout << "Score: " << player->score << "/10\n";
+    cout << "Answer History:\n";
+    for (int i = 0; i < 10; i++) {
+        cout << "- Question " << i + 1 << ": " << player->history[i] << endl;
+    }
+}
+
+// Delete player from linked list
+void deletePlayer(Player*& head, int id) {
+    if (!head) return;
+
+    Player* temp = head;
+    Player* prev = nullptr;
+
+    if (temp && temp->id == id) {
+        head = temp->next;
+        delete temp;
+        cout << "Player deleted.\n";
+        return;
+    }
+
+    while (temp && temp->id != id) {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    if (!temp) {
+        cout << "Player not found.\n";
+        return;
+    }
+
+    prev->next = temp->next;
+    delete temp;
+    cout << "Player deleted.\n";
+}
+
+// Find player by ID
+Player* findPlayerById(Player* head, int id) {
+    while (head) {
+        if (head->id == id) return head;
+        head = head->next;
+    }
+    return nullptr;
+}
+
+// Display questions and record answers
+void displayQuestions(Question questions[], Player* player) {
+    player->score = 0;
+
+    for (int i = 0; i < 10; i++) {
+        cout << "\n" << questions[i].question << endl;
+        for (const auto& option : questions[i].options) {
+            cout << option << endl;
+        }
+
+        char answer;
+        cout << "Enter your answer (A/B/C/D): ";
+        cin >> answer;
+        answer = toupper(answer);
+
+        if (answer == questions[i].correctAnswer) {
+            cout << "Correct!\n";
+            player->score++;
+            player->history[i] = "Correct";
+        } else {
+            cout << "Wrong! Correct answer was " << questions[i].correctAnswer << ".\n";
+            player->history[i] = "Wrong";
+        }
+    }
+}
+
+// Display menu
+void displayMenu() {
+    cout << "\n--- Quiz Game Menu ---\n";
+    cout << "1. Add Player\n";
+    cout << "2. Play Game\n";
+    cout << "3. View Player Record\n";
+    cout << "4. Delete Player Record\n";
+    cout << "5. Find Player by ID\n";
+    cout << "6. Exit\n";
+    cout << "Enter choice: ";
+}
+
+// Main function
+int main() {
+    Player* head = nullptr;
+    int nextId = 1;
+    int choice, id;
+    string name;
+
+    do {
+        displayMenu();
+        cin >> choice;
+
+        switch (choice) {
+            case 1:
+                cout << "Enter player name: ";
+                cin >> name;
+                addPlayer(head, nextId, name);
+                break;
+            case 2:
+                cout << "Enter player ID: ";
+                cin >> id;
+                playGame(head, id);
+                break;
+            case 3:
+                cout << "Enter player ID: ";
+                cin >> id;
+                viewPlayer(head, id);
+                break;
+            case 4:
+                cout << "Enter player ID: ";
+                cin >> id;
+                deletePlayer(head, id);
+                break;
+            case 5:
+                cout << "Enter player ID: ";
+                cin >> id;
+                findPlayerById(head, id) ? cout << "Player found.\n" : cout << "Player not found.\n";
+                break;
+            case 6:
+                cout << "Goodbye!\n";
+                break;
+            default:
+                cout << "Invalid choice. Try again.\n";
+        }
+    } while (choice != 6);
+
+    return 0;
+}
