@@ -1,0 +1,196 @@
+#include <iostream>
+#include <string>
+
+using namespace std;
+
+// Question structure
+struct Question {
+    string question;
+    string options[4];
+    char correctAnswer;
+};
+
+// Player node for linked list
+struct Player {
+    int id;
+    string name;
+    int score;
+    string history[10]; // Stores right/wrong answers for each question
+    Player* next;
+};
+
+// Global variables
+Player* head = nullptr; // Linked list head
+int playerCount = 0;    // Tracks unique IDs
+
+// Question bank
+Question questions[10] = {
+    {"What is the capital of France?", {"A) Paris", "B) London", "C) Rome", "D) Madrid"}, 'A'},
+    {"Which planet is the Red Planet?", {"A) Earth", "B) Mars", "C) Jupiter", "D) Venus"}, 'B'},
+    {"Who wrote 'Hamlet'?", {"A) Dickens", "B) Twain", "C) Shakespeare", "D) Austen"}, 'C'},
+    {"What is 5 + 7?", {"A) 10", "B) 12", "C) 14", "D) 16"}, 'B'},
+    {"Which gas do plants absorb?", {"A) Oxygen", "B) Nitrogen", "C) Carbon Dioxide", "D) Hydrogen"}, 'C'},
+    {"Who painted the Mona Lisa?", {"A) Van Gogh", "B) Picasso", "C) Da Vinci", "D) Michelangelo"}, 'C'},
+    {"What element has symbol 'O'?", {"A) Gold", "B) Oxygen", "C) Silver", "D) Iron"}, 'B'},
+    {"Largest ocean?", {"A) Atlantic", "B) Indian", "C) Arctic", "D) Pacific"}, 'D'},
+    {"Square root of 64?", {"A) 6", "B) 7", "C) 8", "D) 9"}, 'C'},
+    {"Which country has the Great Wall?", {"A) China", "B) India", "C) Japan", "D) Russia"}, 'A'}
+};
+
+// Function prototypes
+void playGame(string playerName);
+void viewPlayer(string playerName);
+void deletePlayer(string playerName);
+void addOrUpdatePlayer(string playerName, int score, string history[10]);
+Player* findPlayer(string playerName);
+void displayMenu();
+
+// Main function
+int main() {
+    int choice;
+    string name;
+
+    while (true) {
+        displayMenu();
+        cout << "Enter choice: ";
+        cin >> choice;
+        cin.ignore(); // Clear input buffer
+
+        switch (choice) {
+            case 1:
+                cout << "Enter player name: ";
+                getline(cin, name);
+                playGame(name);
+                break;
+            case 2:
+                cout << "Enter player name to view record: ";
+                getline(cin, name);
+                viewPlayer(name);
+                break;
+            case 3:
+                cout << "Enter player name to delete: ";
+                getline(cin, name);
+                deletePlayer(name);
+                break;
+            case 4:
+                cout << "Exiting... Goodbye!\n";
+                return 0;
+            default:
+                cout << "Invalid choice. Try again.\n";
+        }
+    }
+}
+
+// Display menu
+void displayMenu() {
+    cout << "\n--- Quiz Game Menu ---\n";
+    cout << "1. Play Game\n";
+    cout << "2. View Player Record\n";
+    cout << "3. Delete Player Record\n";
+    cout << "4. Exit\n";
+}
+
+// Find player in linked list
+Player* findPlayer(string playerName) {
+    Player* temp = head;
+    while (temp != nullptr) {
+        if (temp->name == playerName) return temp;
+        temp = temp->next;
+    }
+    return nullptr;
+}
+
+// Add or update player record
+void addOrUpdatePlayer(string playerName, int score, string history[10]) {
+    Player* existingPlayer = findPlayer(playerName);
+    
+    if (existingPlayer) { // Update existing player
+        existingPlayer->score = score;
+        for (int i = 0; i < 10; i++) {
+            existingPlayer->history[i] = history[i];
+        }
+    } else { // Create new player
+        Player* newPlayer = new Player;
+        newPlayer->id = ++playerCount;
+        newPlayer->name = playerName;
+        newPlayer->score = score;
+        for (int i = 0; i < 10; i++) {
+            newPlayer->history[i] = history[i];
+        }
+        newPlayer->next = head;
+        head = newPlayer;
+    }
+}
+
+// Play the game
+void playGame(string playerName) {
+    int score = 0;
+    string history[10];
+
+    cout << "\nWelcome " << playerName << "! Let's start the quiz.\n\n";
+
+    for (int i = 0; i < 10; i++) {
+        cout << questions[i].question << "\n";
+        for (const auto& option : questions[i].options) {
+            cout << option << "\n";
+        }
+
+        char answer;
+        cout << "Enter your answer (A/B/C/D): ";
+        cin >> answer;
+        answer = toupper(answer);
+
+        if (answer == questions[i].correctAnswer) {
+            cout << "Correct!\n\n";
+            score++;
+            history[i] = "Correct";
+        } else {
+            cout << "Wrong! Correct answer: " << questions[i].correctAnswer << "\n\n";
+            history[i] = "Wrong";
+        }
+    }
+
+    addOrUpdatePlayer(playerName, score, history);
+    cout << "Game over! Your final score is " << score << "/10.\n";
+}
+
+// View player record
+void viewPlayer(string playerName) {
+    Player* player = findPlayer(playerName);
+    if (!player) {
+        cout << "Player not found.\n";
+        return;
+    }
+
+    cout << "\nPlayer: " << player->name << " (ID: " << player->id << ")\n";
+    cout << "Score: " << player->score << "/10\n";
+    cout << "History:\n";
+    for (int i = 0; i < 10; i++) {
+        cout << "- Q" << i + 1 << ": " << player->history[i] << "\n";
+    }
+}
+
+// Delete player record
+void deletePlayer(string playerName) {
+    Player* temp = head;
+    Player* prev = nullptr;
+
+    while (temp != nullptr && temp->name != playerName) {
+        prev = temp;
+        temp = temp->next;
+    }
+
+    if (!temp) {
+        cout << "Player not found.\n";
+        return;
+    }
+
+    if (prev) {
+        prev->next = temp->next;
+    } else {
+        head = temp->next;
+    }
+
+    delete temp;
+    cout << "Player record deleted successfully.\n";
+}
